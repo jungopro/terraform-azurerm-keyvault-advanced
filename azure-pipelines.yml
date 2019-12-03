@@ -17,23 +17,35 @@ steps:
   displayName: 'Install Terraform version $(TF-Version)'
   inputs:
     terraformVersion: '$(TF-Version)'
-- script: export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID); export ARM_CLIENT_ID=$(ARM_CLIENT_ID); export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET); export ARM_TENANT_ID=$(ARM_TENANT_ID)
-- script: env
-- script: terraform init -get=true -upgrade=true
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Terraform Init'
-- script: 'terraform validate'
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Validate Terraform Code'
-- script: 'terraform plan -var=location=$(location) -var=resource_group_name=$(resource-group)'
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Terraform Dry Run (Plan)'
-- script: 'terraform apply -var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Terraform Run (Apply)'
-- script: 'terraform destroy -var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
-  workingDirectory: '$(Build.SourcesDirectory)'
-  displayName: 'Terraform Destroy'
+- task: TerraformCLI@0
+  displayName: 'Initialize'
+  inputs:
+    command: 'init'
+- task: TerraformCLI@0
+  displayName: 'Validate'
+  inputs:
+    command: 'validate'
+    workingDirectory: '$(Build.SourcesDirectory)'
+- task: TerraformCLI@0
+  displayName: 'Plan'
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
+- task: TerraformCLI@0
+  displayName: 'Apply'
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
+    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
+- task: TerraformCLI@0
+  displayName: 'Destroy'
+  inputs:
+    command: 'destroy'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
+    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
