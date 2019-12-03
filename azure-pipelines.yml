@@ -32,3 +32,27 @@ steps:
 - script: 'terraform destroy -var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Terraform Destroy'
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: |
+     **/*
+     !.git/**/*
+     !.terraform/**/*
+     !*.tfstate
+     !*.tfstate.*
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+    OverWrite: true
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'github.com_jungopro'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'gitTag'
+    tagPattern: 'release-v1.*'
+    releaseNotesSource: 'inline'
+    releaseNotesInline: 'Additional Notes'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
