@@ -32,6 +32,7 @@ steps:
     command: 'plan'
     workingDirectory: '$(Build.SourcesDirectory)'
     environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
+    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group)'
 - task: TerraformCLI@0
   displayName: 'Apply'
   inputs:
