@@ -65,7 +65,7 @@ steps:
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
     tagSource: 'userSpecifiedTag'
-    tag: 'release-1.$(Build.BuildNumber).0'
+    tag: '1.$(Build.BuildId).0'
     releaseNotesSource: 'inline'
     releaseNotesInline: 'Notes'
     changeLogCompareToRelease: 'lastFullRelease'
