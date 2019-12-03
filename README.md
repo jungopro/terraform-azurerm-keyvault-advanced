@@ -9,7 +9,7 @@ This module also has the option to create a Resource Group for the Key Vault, al
 
 ## Usage
 
-```tf
+```hcl
 module "keyvault" {
   source              = "jungopro/keyvault-advanced/azurerm"
   resource_group_name = "myKeyVaultResourceGroup"
