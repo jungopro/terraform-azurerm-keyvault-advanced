@@ -17,6 +17,8 @@ steps:
   displayName: 'Install Terraform version $(TF-Version)'
   inputs:
     terraformVersion: '$(TF-Version)'
+- script: env
+  workingDirectory: '$(Build.SourcesDirectory)'
 - script: terraform init -get=true -upgrade=true
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Terraform Init'
