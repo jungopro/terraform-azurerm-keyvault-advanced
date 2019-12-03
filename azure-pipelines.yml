@@ -1,11 +1,5 @@
 name: Build-$(Build.BuildId)
 
-variables:
-  ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-  ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-  ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-  ARM_TENANT_ID: $(ARM_TENANT_ID)
-
 trigger:
   branches:
     include:
@@ -23,8 +17,8 @@ steps:
   displayName: 'Install Terraform version $(TF-Version)'
   inputs:
     terraformVersion: '$(TF-Version)'
+- script: export ARM_SUBSCRIPTION_ID=$(ARM_SUBSCRIPTION_ID); export ARM_CLIENT_ID=$(ARM_CLIENT_ID); export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET); export ARM_TENANT_ID=$(ARM_TENANT_ID)
 - script: env
-  workingDirectory: '$(Build.SourcesDirectory)'
 - script: terraform init -get=true -upgrade=true
   workingDirectory: '$(Build.SourcesDirectory)'
   displayName: 'Terraform Init'
