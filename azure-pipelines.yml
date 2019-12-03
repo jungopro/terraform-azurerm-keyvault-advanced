@@ -66,7 +66,7 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'userSpecifiedTag'
-    tag: 'release'
+    tag: '$(Build.SourceVersion)'
     releaseNotesSource: 'inline'
     releaseNotesInline: 'Additional Notes'
     changeLogCompareToRelease: 'lastFullRelease'
