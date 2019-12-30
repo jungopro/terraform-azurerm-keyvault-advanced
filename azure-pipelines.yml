@@ -12,41 +12,54 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+- group: Terraform
+
 steps:
 - task: TerraformInstaller@0
   displayName: 'Install Terraform version $(TF-Version)'
   inputs:
     terraformVersion: '$(TF-Version)'
-- task: TerraformCLI@0
-  displayName: 'Initialize'
-  inputs:
-    command: 'init'
-- task: TerraformCLI@0
-  displayName: 'Validate'
-  inputs:
-    command: 'validate'
-    workingDirectory: '$(Build.SourcesDirectory)'
-- task: TerraformCLI@0
-  displayName: 'Plan'
-  inputs:
-    command: 'plan'
-    workingDirectory: '$(Build.SourcesDirectory)'
-    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
-    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group)'
-- task: TerraformCLI@0
-  displayName: 'Apply'
-  inputs:
-    command: 'apply'
-    workingDirectory: '$(Build.SourcesDirectory)'
-    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
-    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
-- task: TerraformCLI@0
-  displayName: 'Destroy'
-  inputs:
-    command: 'destroy'
-    workingDirectory: '$(Build.SourcesDirectory)'
-    environmentServiceName: 'Visual Studio Enterprise – MPN(3211b6f2-32a6-410d-97b9-5c24bcda7d0b)'
-    commandOptions: '-var=location=$(location) -var=resource_group_name=$(resource-group) -auto-approve'
+- script: terraform init -get=true -upgrade=true
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Terraform Init'
+  env:
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
+- script: 'terraform validate'
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Validate Terraform Code'
+  env:
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
+- script: 'terraform plan -var=resource_group_location=$(location) -var=resource_group_name=$(resource-group) -var=create_resource_group=true'
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Terraform Dry Run (Plan)'
+  env:
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
+- script: 'terraform apply -var=resource_group_location=$(location) -var=resource_group_name=$(resource-group) -var=create_resource_group=true -auto-approve'
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Terraform Run (Apply)'
+  env:
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
+- script: 'terraform destroy -var=resource_group_location=$(location) -var=resource_group_name=$(resource-group) -var=create_resource_group=true -auto-approve'
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Terraform Destroy'
+  env:
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)'
@@ -64,9 +77,10 @@ steps:
     gitHubConnection: 'github.com_jungopro'
     repositoryName: '$(Build.Repository.Name)'
     action: 'create'
+    target: '$(Build.SourceVersion)'
     tagSource: 'userSpecifiedTag'
     tag: '1.$(Build.BuildId).0'
     releaseNotesSource: 'inline'
-    releaseNotesInline: 'Notes'
+    releaseNotesInline: 'Additional Notes'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
